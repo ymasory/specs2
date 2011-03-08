@@ -93,7 +93,6 @@ class TextPrinterSpec extends SpecificationWithJUnit { def is =
   val bigFail    = "with diffs" ! { bigString1 must_== bigString2 }
   
   case class prez() {
-    val noindent: Arguments = args(noindent = true)
     
     def e1 = print(t1 ^ ex1 ^ ex2) must 
              contain("t1",
@@ -103,7 +102,7 @@ class TextPrinterSpec extends SpecificationWithJUnit { def is =
     def e2 = print(noindent ^ t1 ^ "  e1"!success ^ " e2"! success) must 
              contain("t1",
                      "+ e1",
-                     "+ e2")
+                     " + e2")
   }
   case class xonlyargs() {
     val xonly: Arguments = args(xonly = true)
