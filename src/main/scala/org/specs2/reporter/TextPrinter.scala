@@ -154,7 +154,9 @@ trait TextPrinter {
       val textLines = text.split("\n")
       def time = if (args.showtimes) " ("+timer.time+")" else ""
       val firstLine = textLines.take(1).map { s =>
-        s.takeWhile(_ == ' ').dropRight(2) +
+        val last = s.takeWhile(_ == ' ')
+		val trimmed = if (last.length >=2) last.slice(0, last.length-2) else last
+		trimmed +
         out.status(result)(args) + s.dropWhile(_ == ' ') + time
       }
       val rest = textLines.drop(1)
