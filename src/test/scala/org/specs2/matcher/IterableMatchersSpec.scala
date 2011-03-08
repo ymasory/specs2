@@ -1,7 +1,7 @@
 package org.specs2
 package matcher
-import java.util.Arrays._
-import scala.collection.JavaConversions.{ asScalaIterable }
+import java.util.Arrays
+import scala.collection.JavaConversions._
 
 class IterableMatchersSpec extends SpecificationWithJUnit { def is =
 
@@ -56,9 +56,9 @@ class IterableMatchersSpec extends SpecificationWithJUnit { def is =
                                                                                                                         p^
   "Java collections can also be used with Iterable matchers"                                                            ^bt^
   "But generally require explicit conversion"                                                                           ^
-    { asList("Hello", "World") must haveSize(2) }                                                                       ^
-    { asList("Hello", "World").toList must containMatch("ll") }                                                         ^
-                                                                                                                end
+    { Arrays.asList("Hello", "World") must haveSize(2) }                                                                ^
+    { JListWrapper(Arrays.asList("Hello", "World")) must containMatch("ll") }                                           ^
+                                                                                                                        end
 
   case class subclass() {
     class Food

@@ -93,7 +93,7 @@ class TextPrinterSpec extends SpecificationWithJUnit { def is =
   val bigFail    = "with diffs" ! { bigString1 must_== bigString2 }
   
   case class prez() {
-    val noindent = args(noindent = true)
+    val noindent: Arguments = args(noindent = true)
     
     def e1 = print(t1 ^ ex1 ^ ex2) must 
              contain("t1",

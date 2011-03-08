@@ -16,7 +16,7 @@ import FormattingFragments._
  * 
  */
 private[specs2]
-trait FragmentsBuilder {
+trait FragmentsBuilder extends HtmlLinksLowerImplicits {
 
   /**
    * Methods for chaining fragments
@@ -121,7 +121,8 @@ trait FragmentsBuilder {
     def ~(p: (String, SpecificationStructure, String, String)) =
       See(HtmlLink(p._2.content.start.name, link.beforeText, p._1, p._3, p._4)) ^ p._2.content.fragments
   }
-
+}
+trait HtmlLinksLowerImplicits { this: FragmentsBuilder =>
   implicit def stringToHtmlLinkFragments2(s: String): HtmlLinkFragments2 = new HtmlLinkFragments2(HtmlLink(SpecName(""), s, "", "", "", Success()))
   class HtmlLinkFragments2(link: HtmlLink) {
     def ~(p: (SpecificationStructure, String)) =

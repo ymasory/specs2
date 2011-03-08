@@ -23,7 +23,6 @@ class XmlMatchersSpec extends SpecificationWithJUnit { def is =
                                                                                                                         p^
     "provide be + matchers forms"                                                                                       ^
     { <a><b/></a> must be equalToIgnoringSpace(<a> <b/></a>) }                                                          ^
-    { <a><b/></a> must be ==/(<a> <b/></a>) }                                                                           ^
     { <a><b/></a> must not be ==/(<b></b>) }                                                                            ^
                                                                                                                         endp^
   "A \\ matcher should match if a node is a direct child of another"                                                    ^
