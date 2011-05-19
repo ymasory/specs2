@@ -13,7 +13,7 @@ class Project(info: ProjectInfo) extends DefaultProject(info) with ScctProject w
 
   val scalacheck    = "org.scala-tools.testing" %% "scalacheck" % "1.8" 
   val testinterface = "org.scala-tools.testing" % "test-interface" % "0.5" 
-  val scalazcore    = "org.specs2" %% "scalaz-core" % "5.1-SNAPSHOT" 
+  val scalazcore    = "org.specs2" %% "specs2-scalaz-core" % "5.1-SNAPSHOT" 
   val hamcrest      = "org.hamcrest" % "hamcrest-all" % "1.1"
   val mockito 	    = "org.mockito" % "mockito-all" % "1.8.5" 
   val junit         = "junit" % "junit" % "4.7"
