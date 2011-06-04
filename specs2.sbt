@@ -1,12 +1,16 @@
 /** Project */
 name := "specs2"
-version := "1.1-SNAPSHOT"
+
+version := "1.4-SNAPSHOT"
+
 organization := "org.specs2"
+
 scalaVersion := "2.8.1"
 
 /** Shell */
 shellPrompt := { state => System.getProperty("user.name") + "> " }
-shellPrompt in ThisBuild := { state => Project.extract(state).cid + "> " }
+
+shellPrompt in ThisBuild := { state => Project.extract(state).currentRef.project + "> " }
 
 /** Dependencies */
 resolvers ++= Seq("snapshots-repo" at "http://scala-tools.org/repo-snapshots", 
@@ -19,24 +23,31 @@ libraryDependencies ++= Seq(
   "org.hamcrest" % "hamcrest-all" % "1.1",
   "org.mockito" % "mockito-all" % "1.8.5",
   "junit" % "junit" % "4.7",
-  "org.pegdown" % "pegdown" % "0.9.1"
+  "org.pegdown" % "pegdown" % "1.0.1"
 )
 
 /** Compilation */
-javacOptions ++= Seq("-Xmx256m", "-Xms64m", "-Xss4m")
+javacOptions ++= Seq("-Xmx1812m", "-Xms512m", "-Xss4m")
+
 scalacOptions += "-deprecation"
+
 maxErrors := 20
+
 pollInterval := 1000
+
+testFrameworks += new TestFramework("org.specs2.runner.SpecsFramework")
 
 /** Console */
 initialCommands in console := "import org.specs2._"
 
-/** Packaging */
+// Packaging
 
 /** Publishing */
+credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 
-Credentials(Path.userHome / ".ivy2" / ".credentials", log)
-
-val nexusDirect = "http://nexus-direct.scala-tools.org/content/repositories/"
-publishTo := if (version.toString.endsWith("SNAPSHOT")) Some("snapshots" at nexusDirect + "snapshots/")
-	           else                                       Some("releases" at nexusDirect + "releases/")
+publishTo := {
+ if (version.toString.endsWith("SNAPSHOT")) 
+   Some("snapshots" at "http://nexus-direct.scala-tools.org/content/repositories/snapshots/") 
+ else 
+   Some("releases" at "http://nexus-direct.scala-tools.org/content/repositories/releases/")
+}
