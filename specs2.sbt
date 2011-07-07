@@ -1,7 +1,7 @@
 /** Project */
 name := "specs2"
 
-version := "1.4-SNAPSHOT"
+version := "1.5"
 
 organization := "org.specs2"
 
@@ -19,7 +19,7 @@ resolvers ++= Seq("snapshots-repo" at "http://scala-tools.org/repo-snapshots",
 libraryDependencies ++= Seq(
   "org.scala-tools.testing" %% "scalacheck" % "1.8", 
   "org.scala-tools.testing" % "test-interface" % "0.5", 
-  "com.googlecode.scalaz" %% "scalaz-core" % "5.1-SNAPSHOT",
+  "org.specs2" %% "specs2-scalaz-core" % "5.1-SNAPSHOT",
   "org.hamcrest" % "hamcrest-all" % "1.1",
   "org.mockito" % "mockito-all" % "1.8.5",
   "junit" % "junit" % "4.7",
