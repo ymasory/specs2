@@ -1,0 +1,4 @@
+ 
+ Fixed [issue 37](https://github.com/etorreborre/specs2/issues/37): broken Pending icon in html reports
+ 
+ ==========================
