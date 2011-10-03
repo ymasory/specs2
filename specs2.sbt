@@ -17,7 +17,7 @@ resolvers ++= Seq("snapshots-repo" at "http://scala-tools.org/repo-snapshots",
                   "Local Maven Repository" at "file://$M2_REPO")
 
 libraryDependencies ++= Seq(
-  "org.scala-tools.testing" %% "scalacheck" % "1.8", 
+  "org.scala-tools.testing" % "scalacheck_2.8.1" % "1.8", 
   "org.scala-tools.testing" % "test-interface" % "0.5", 
   "org.specs2" %% "specs2-scalaz-core" % "5.1-SNAPSHOT",
   "org.hamcrest" % "hamcrest-all" % "1.1",
@@ -49,6 +49,8 @@ initialCommands in console := "import org.specs2._"
 // Packaging
 
 /** Publishing */
+publishArtifact in (Compile, packageDoc) := false
+
 credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 
 publishTo <<= (version) { version: String =>
