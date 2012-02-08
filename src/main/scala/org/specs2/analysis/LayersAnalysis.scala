@@ -6,7 +6,7 @@ import util.Properties._
 /**
  * This trait allows to define expected dependencies between packages layers
  */
-trait LayersAnalysis extends ClassycleDependencyFinder {
+trait LayersAnalysis extends CompilerDependencyFinder {
 
   /** this implicit definition allows to use a single string instead of a Layer object */
   implicit def toLayer(s: String): Layer = layer(s.split("\\s").map(l => l.trim):_*)

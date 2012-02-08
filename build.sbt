@@ -30,9 +30,7 @@ libraryDependencies <<= scalaVersion { scala_version => Seq(
   "org.hamcrest" % "hamcrest-all" % "1.1" % "optional",
   "org.mockito" % "mockito-all" % "1.9.0" % "optional",
   "junit" % "junit" % "4.7" % "optional",
-  "org.pegdown" % "pegdown" % "1.0.2" % "optional",
-  "org.specs2" %% "classycle" % "1.4" % "optional"
-  )
+  "org.pegdown" % "pegdown" % "1.0.2" % "optional")
 }
 
 /** Compilation */
@@ -51,7 +49,7 @@ logBuffered := false
 cancelable := true
 
 testOptions := Seq(Tests.Filter(s =>
-  Seq("Spec", "Suite", "Unit", "all").exists(s.endsWith(_)) &&
+  Seq("Spec", "Suite", "Unit").exists(s.endsWith(_)) &&
     !s.endsWith("FeaturesSpec") ||
     s.contains("UserGuide") || 
   	s.contains("index") ||
