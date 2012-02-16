@@ -1,17 +1,17 @@
 import sbtrelease._
 import Release._
 import ReleaseKeys._
-
+ 
 /** Project */
 name := "specs2"
 
-version := "1.7.1"
+version := "1.7-SNAPSHOT"
 
 organization := "org.specs2"
 
 scalaVersion := "2.9.1"
 
-crossScalaVersions := Seq("2.9.0")
+crossScalaVersions := Seq("2.9.0", "2.9.0-1")
 
 /** Shell */
 shellPrompt := { state => System.getProperty("user.name") + "> " }
@@ -19,8 +19,7 @@ shellPrompt := { state => System.getProperty("user.name") + "> " }
 shellPrompt in ThisBuild := { state => Project.extract(state).currentRef.project + "> " }
 
 /** Dependencies */
-resolvers ++= Seq("snapshots-repo" at "http://scala-tools.org/repo-snapshots", 
-                  "Local Maven Repository" at "file://c:/Documents and Settings/Eric/.m2/repository")
+resolvers ++= Seq("snapshots-repo" at "http://oss.sonatype.org/content/repositories/snapshots")
 
 libraryDependencies <<= scalaVersion { scala_version => Seq(
   "org.specs2" %% "specs2-scalaz-core" % "6.0.1",
@@ -50,7 +49,7 @@ logBuffered := false
 cancelable := true
 
 testOptions := Seq(Tests.Filter(s =>
-  Seq("Spec", "Suite", "Unit", "all").exists(s.endsWith(_)) &&
+  Seq("Spec", "Suite", "Unit").exists(s.endsWith(_)) &&
     !s.endsWith("FeaturesSpec") ||
     s.contains("UserGuide") || 
   	s.contains("index") ||
@@ -59,6 +58,45 @@ testOptions := Seq(Tests.Filter(s =>
 /** Console */
 initialCommands in console := "import org.specs2._"
 
+
+
+/** Publishing */
+credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
+
+publishTo <<= version { v: String =>
+  val nexus = "https://oss.sonatype.org/"
+  if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
+  else                             Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
+
+publishMavenStyle := true
+
+publishArtifact in Test := false
+
+pomIncludeRepository := { x => false }
+
+pomExtra := (
+  <url>http://specs2.org/</url>
+  <licenses>
+    <license>
+      <name>MIT-style</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>http://github.com/etorreborre/specs2</url>
+    <connection>scm:http:http://etorreborre@github.com/etorreborre/specs2.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>etorreborre</id>
+      <name>Eric Torreborre</name>
+      <url>http://etorreborre.blogspot.com/</url>
+      </developer>
+    </developers>
+)
+ 
 seq(releaseSettings: _*)
 
 releaseProcess <<= thisProjectRef apply { ref =>
@@ -79,17 +117,6 @@ releaseProcess <<= thisProjectRef apply { ref =>
   )
 }
 
-
-/** Publishing */
-credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
-
-publishTo <<= (version) { version: String =>
-  val nexus = "http://nexus-direct.scala-tools.org/content/repositories/"
-  if (version.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus+"snapshots/") 
-  else                                   Some("releases" at nexus+"releases/")
-}
-
 seq(lsSettings :_*)
 
-(LsKeys.ghBranch in LsKeys.lsync) := Some("1.7.1")
-
+(LsKeys.ghBranch in LsKeys.lsync) := Some("1.8")
