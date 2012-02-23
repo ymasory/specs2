@@ -9,9 +9,7 @@ version := "1.8.2"
 
 organization := "org.specs2"
 
-scalaVersion := "2.9.1"
-
-crossScalaVersions := Seq("2.9.0", "2.9.0-1")
+scalaVersion := "2.9.0-1"
 
 /** Shell */
 shellPrompt := { state => System.getProperty("user.name") + "> " }
@@ -22,7 +20,7 @@ shellPrompt in ThisBuild := { state => Project.extract(state).currentRef.project
 resolvers ++= Seq("snapshots-repo" at "http://oss.sonatype.org/content/repositories/snapshots")
 
 libraryDependencies <<= scalaVersion { scala_version => Seq(
-  "org.specs2" %% "specs2-scalaz-core" % "6.0.1",
+  "org.specs2" %% "specs2-scalaz-core" % "6.0.RC2",
   "org.scala-lang" % "scala-compiler" % scala_version % "optional", 
   "org.scala-tools.testing" %% "scalacheck" % "1.9" % "optional", 
   "org.scala-tools.testing" % "test-interface" % "0.5" % "optional", 
