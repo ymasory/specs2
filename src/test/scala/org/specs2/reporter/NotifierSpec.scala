@@ -1,6 +1,6 @@
 package org.specs2
 package reporter
-import scala.collection.JavaConversions.asIterable
+
 import mock.Mockito
 import specification._
 import main.Arguments
