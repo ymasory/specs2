@@ -9,23 +9,23 @@ import execute._
  * 
  * This can be used for example to execute some code inside a webapp session
  * 
- * @see Example to understand why the type T must <% Result
+ * @see Example to understand why the type T must : Executable
  */
 trait Around extends Context { outer =>
 
-  def around[T <% Result](t: =>T): Result
-  def apply[T <% Result](a: =>T) = around(a)
+  def around[T : Executable](t: =>T): Result
+  def apply[T : Executable](a: =>T) = around(a)
   
   /** compose the actions of 2 Around traits */
   def compose(a: Around): Around = new Around {
-    def around[T <% Result](t: =>T): Result = {
+    def around[T : Executable](t: =>T): Result = {
       a.around(outer.around(t))
     }
   }
 
   /** sequence the actions of 2 Around traits */
   def then(a: Around): Around = new Around {
-    def around[T <% Result](t: =>T): Result = {
+    def around[T : Executable](t: =>T): Result = {
       outer.around(a.around(t))
     }
   }

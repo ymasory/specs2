@@ -21,8 +21,8 @@ trait ResultBaseMatchers {
     }
   }
 
-  def beFailing[T <% Result]: Matcher[T] = beFailing(None)
-  def beFailing[T <% Result](message: String): Matcher[T] = beFailing(Some(message))
+  def beFailing[T : Executable]: Matcher[T] = beFailing(None)
+  def beFailing[T : Executable](message: String): Matcher[T] = beFailing(Some(message))
   def beFailing[T](message: Option[String])(implicit toResult: T => Result): Matcher[T] = new Matcher[T] {
     def apply[S <: T](value: Expectable[S]) = {
       result(toResult(value.value).isFailure,
@@ -36,8 +36,8 @@ trait ResultBaseMatchers {
     }
   }
 
-  def beError[T <% Result]: Matcher[T] = beError(None)
-  def beError[T <% Result](message: String): Matcher[T] = beError(Some(message))
+  def beError[T : Executable]: Matcher[T] = beError(None)
+  def beError[T : Executable](message: String): Matcher[T] = beError(Some(message))
   def beError[T](message: Option[String])(implicit toResult: T => Result): Matcher[T] = new Matcher[T] {
     def apply[S <: T](value: Expectable[S]) = {
       result(toResult(value.value).isError,
@@ -51,8 +51,8 @@ trait ResultBaseMatchers {
     }
   }
 
-  def beSkipped[T <% Result]: Matcher[T] = beSkipped(None)
-  def beSkipped[T <% Result](message: String): Matcher[T] = beSkipped(Some(message))
+  def beSkipped[T : Executable]: Matcher[T] = beSkipped(None)
+  def beSkipped[T : Executable](message: String): Matcher[T] = beSkipped(Some(message))
   def beSkipped[T](message: Option[String])(implicit toResult: T => Result): Matcher[T] = new Matcher[T] {
     def apply[S <: T](value: Expectable[S]) = {
       result(toResult(value.value).isSkipped,
@@ -68,8 +68,8 @@ trait ResultBaseMatchers {
 }
 private[specs2]
 trait ResultBeHaveMatchers { outer: ResultBaseMatchers =>
-  implicit def toResultMatcher[T <% Result](result: MatchResult[T]) = new ResultMatcher(result)
-  class ResultMatcher[T <% Result](result: MatchResult[T]) {
+  implicit def toResultMatcher[T : Executable](result: MatchResult[T]) = new ResultMatcher(result)
+  class ResultMatcher[T : Executable](result: MatchResult[T]) {
     def successful = result(outer.beSuccessful[T])
     def beSuccessful = result(outer.beSuccessful[T])
 
@@ -80,10 +80,10 @@ trait ResultBeHaveMatchers { outer: ResultBaseMatchers =>
   }
 
   def successful = outer.beSuccessful[Result]
-  def successful[T <% Result] = outer.beSuccessful[T]
+  def successful[T : Executable] = outer.beSuccessful[T]
 
   def failing = outer.beFailing[Result](".*")
-  def failing[T <% Result] = outer.beFailing[T](".*")
+  def failing[T : Executable] = outer.beFailing[T](".*")
 
-  def failing[T <% Result](m: String = ".*") = outer.beFailing[T](".*")
+  def failing[T : Executable](m: String = ".*") = outer.beFailing[T](".*")
 }

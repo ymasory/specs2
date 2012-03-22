@@ -2,7 +2,7 @@ package org.specs2
 package specification
 
 import collection.Iterablex._
-import execute.Executable
+import execute.IsExecutable
 import main.Arguments
 import org.specs2.internal.scalaz.Monoid
 import Fragments._
@@ -22,7 +22,7 @@ case class Fragments(private val title: Option[SpecName] = None, middle: Seq[Fra
   def linkIs(htmlLink: HtmlLink) = copy(link = Some(htmlLink))
   def seeIs(htmlLink: HtmlLink) = copy(middle = Vector(), link = Some(htmlLink), seeOnly = true)
 
-  def executables: Seq[Executable] = fragments.collect { case e: Executable => e }
+  def executables: Seq[IsExecutable] = fragments.collect { case e: IsExecutable => e }
   def examples: Seq[Example] = fragments.collect(isAnExample)
 
   def overrideArgs(args: Arguments) = copy(arguments = arguments.overrideWith(args))

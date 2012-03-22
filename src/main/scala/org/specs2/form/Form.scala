@@ -18,7 +18,7 @@ import DecoratedProperties._
  * 
  * A Form can be executed by executing each row and collecting the results.
  */
-class Form(val title: Option[String] = None, val rows: Seq[Row] = Vector(),  val result: Option[Result] = None) extends Executable with Text {
+class Form(val title: Option[String] = None, val rows: Seq[Row] = Vector(),  val result: Option[Result] = None) extends IsExecutable with Text {
 
   /** @return all rows, including the header */
   lazy val allRows = title.map(t => Row.tr(TextCell(t))).toSeq ++ rows

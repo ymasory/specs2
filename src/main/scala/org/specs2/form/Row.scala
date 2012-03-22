@@ -11,7 +11,7 @@ import StandardResults._
  * 
  * A Row can be executed by executing each Cell and collecting the results.
  */
-case class Row(private val cellList: NonEmptyList[Cell]) extends Executable {
+case class Row(private val cellList: NonEmptyList[Cell]) extends IsExecutable {
   /** @return all the cells */
   def cells = cellList.list.toSeq
   

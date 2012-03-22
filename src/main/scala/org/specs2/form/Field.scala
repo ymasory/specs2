@@ -15,7 +15,7 @@ import text.NotNullStrings._
  * The value is stored in a Property object so it will not be evaluated until explicitly
  * queried.
  */
-case class Field[T](label: String, value: Property[T], decorator: Decorator = Decorator()) extends Executable with StandardResults
+case class Field[T](label: String, value: Property[T], decorator: Decorator = Decorator()) extends IsExecutable with StandardResults
   with DecoratedProperty[Field[T]] {
   /** executing a field execute the value and returns success unless there is an Error */
   override def execute = {

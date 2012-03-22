@@ -17,7 +17,7 @@ import text.Markdown
  * This feature is used to display rows of values with were expected and found ok in Forms.
  *
  */
-trait Cell extends Text with Xml with Executable {
+trait Cell extends Text with Xml with IsExecutable {
   def setSuccess: Cell
   def setFailure: Cell
 

@@ -142,5 +142,5 @@ class GivenThenFunction[R](f: PartialFunction[Any, R], regex: String= "")(implic
   def extract(text: String): Result = RegexStep.extract(text, { case a => conv(f(a)) }, regexToUse)
 }
 object so {
-  def apply[R <% Result](f: PartialFunction[Any, R]): GivenThen = new GivenThenFunction(f)
+  def apply[R : Executable](f: PartialFunction[Any, R]): GivenThen = new GivenThenFunction(f)
 }

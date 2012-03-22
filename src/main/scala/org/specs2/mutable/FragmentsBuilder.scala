@@ -44,10 +44,10 @@ trait FragmentsBuilder extends specification.FragmentsBuilder with ExamplesFacto
   implicit def inExample(s: String): InExample = new InExample(s)
   /** transient class to hold an example description before creating a full Example */
   class InExample(s: String) {
-    def in[T <% Result](r: =>T): Example = exampleFactory.newExample(s, r)
-    def in[T <% Result](f: String => T): Example = exampleFactory.newExample(s, f(s))
-    def >>[T <% Result](r: =>T): Example = in(r)
-    def >>[T <% Result](f: String => T): Example = in(f)
+    def in[T : Executable](r: =>T): Example = exampleFactory.newExample(s, r)
+    def in[T : Executable](f: String => T): Example = exampleFactory.newExample(s, f(s))
+    def >>[T : Executable](r: =>T): Example = in(r)
+    def >>[T : Executable](f: String => T): Example = in(f)
     def in(gt: GivenThen): Example = exampleFactory.newExample(s, gt)
     def >>(gt: GivenThen): Example = exampleFactory.newExample(s, gt)
 
@@ -110,23 +110,23 @@ trait FragmentsBuilder extends specification.FragmentsBuilder with ExamplesFacto
     def <<(f: Function9[String, String, String, String, String, String, String, String, String, Unit]): Fragments = createStep(s, f.tupled(extract9(s)))
     def <<(f: Function10[String, String, String, String, String, String, String, String, String, String, Unit]): Fragments = createStep(s, f.tupled(extract10(s)))
 
-    def <<[R <% Result](r: =>R): Example = createExample(s, r)
-    def <<[R <% Result](f: Function[String, R]): Example = createExample(s, f(extract1(s)))
-    def <<[R <% Result](f: Function2[String, String, R]): Example = createExample(s, f.tupled(extract2(s)))
-    def <<[R <% Result](f: Function3[String, String, String, R]): Example = createExample(s, f.tupled(extract3(s)))
-    def <<[R <% Result](f: Function4[String, String, String, String, R]): Example = createExample(s, f.tupled(extract4(s)))
-    def <<[R <% Result](f: Function5[String, String, String, String, String, R]): Example = createExample(s, f.tupled(extract5(s)))
-    def <<[R <% Result](f: Function6[String, String, String, String, String, String, R]): Example = createExample(s, f.tupled(extract6(s)))
-    def <<[R <% Result](f: Function7[String, String, String, String, String, String, String, R]): Example = createExample(s, f.tupled(extract7(s)))
-    def <<[R <% Result](f: Function8[String, String, String, String, String, String, String, String, R]): Example = createExample(s, f.tupled(extract8(s)))
-    def <<[R <% Result](f: Function9[String, String, String, String, String, String, String, String, String, R]): Example = createExample(s, f.tupled(extract9(s)))
-    def <<[R <% Result](f: Function10[String, String, String, String, String, String, String, String, String, String, R]): Example = createExample(s, f.tupled(extract10(s)))
+    def <<[R : Executable](r: =>R): Example = createExample(s, r)
+    def <<[R : Executable](f: Function[String, R]): Example = createExample(s, f(extract1(s)))
+    def <<[R : Executable](f: Function2[String, String, R]): Example = createExample(s, f.tupled(extract2(s)))
+    def <<[R : Executable](f: Function3[String, String, String, R]): Example = createExample(s, f.tupled(extract3(s)))
+    def <<[R : Executable](f: Function4[String, String, String, String, R]): Example = createExample(s, f.tupled(extract4(s)))
+    def <<[R : Executable](f: Function5[String, String, String, String, String, R]): Example = createExample(s, f.tupled(extract5(s)))
+    def <<[R : Executable](f: Function6[String, String, String, String, String, String, R]): Example = createExample(s, f.tupled(extract6(s)))
+    def <<[R : Executable](f: Function7[String, String, String, String, String, String, String, R]): Example = createExample(s, f.tupled(extract7(s)))
+    def <<[R : Executable](f: Function8[String, String, String, String, String, String, String, String, R]): Example = createExample(s, f.tupled(extract8(s)))
+    def <<[R : Executable](f: Function9[String, String, String, String, String, String, String, String, String, R]): Example = createExample(s, f.tupled(extract9(s)))
+    def <<[R : Executable](f: Function10[String, String, String, String, String, String, String, String, String, String, R]): Example = createExample(s, f.tupled(extract10(s)))
 
     private def createStep(s: String, u: =>Unit) = {
       strip(s).txt
       step(u)
     }
-    private def createExample[R <% Result](s: String, r: =>R) = {
+    private def createExample[R : Executable](s: String, r: =>R) = {
       forExample(strip(s)) ! r
     }
   }
@@ -147,7 +147,7 @@ trait FragmentsBuilder extends specification.FragmentsBuilder with ExamplesFacto
     a
   }
 
-  protected def addExample[T <% Result](ex: =>Example): Example = {
+  protected def addExample[T : Executable](ex: =>Example): Example = {
     val example = ex
     specFragments = new FragmentsFragment(specFragments) ^ example
     example

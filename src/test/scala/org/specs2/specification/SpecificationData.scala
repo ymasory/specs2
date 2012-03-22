@@ -6,7 +6,7 @@ import text.TextData._
 import execute.StandardResults._
 import collection.Iterablex._
 import specification.StandardFragments._
-import execute.Executable
+import execute.IsExecutable
 
 trait SpecificationData extends Data[Specification] {
 
@@ -67,7 +67,7 @@ trait SpecificationData extends Data[Specification] {
 
   def addTime(time: Int): Fragment => Fragment = (f: Fragment) => {
     f match {
-      case e: Executable => e.map(b => {Thread.sleep(time); b}).asInstanceOf[Fragment]
+      case e: IsExecutable => e.map(b => {Thread.sleep(time); b}).asInstanceOf[Fragment]
       case other         => other
     }
   }

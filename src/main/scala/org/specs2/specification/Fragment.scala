@@ -82,7 +82,7 @@ case class Text(t: String) extends Fragment {
  * - a description: some text, with possibly some markup annotations for rendering code fragments (used in AutoExamples)
  * - a body: some executable code returning a Result
  */
-case class Example private[specification] (desc: MarkupString = NoMarkup(""), body: () => Result) extends Fragment with Executable with Isolable {
+case class Example private[specification] (desc: MarkupString = NoMarkup(""), body: () => Result) extends Fragment with IsExecutable with Isolable {
   val isolable = true
 
   def execute = body()
@@ -102,8 +102,8 @@ case class Example private[specification] (desc: MarkupString = NoMarkup(""), bo
 }
 
 case object Example {
-  def apply[T <% Result](desc: String, body: =>T) = new Example(NoMarkup(desc), () => body)
-  def apply[T <% Result](markup: MarkupString, body: =>T) = new Example(markup, () => body)
+  def apply[T : Executable](desc: String, body: =>T) = new Example(NoMarkup(desc), () => body)
+  def apply[T : Executable](markup: MarkupString, body: =>T) = new Example(markup, () => body)
 }
 
 /**
@@ -118,7 +118,7 @@ case object Example {
  * @see the ContextSpec specification
  *
  */
-case class Step (step: LazyParameter[Result] = lazyfy(Success())) extends Fragment with Executable with Isolable {
+case class Step (step: LazyParameter[Result] = lazyfy(Success())) extends Fragment with IsExecutable with Isolable {
   val isolable = true
 
   def execute = step.value
@@ -149,7 +149,7 @@ case object Step {
  *
  * It is only reported in case of a failure
  */
-case class Action (action: LazyParameter[Result] = lazyfy(Success())) extends Fragment with Executable with Isolable {
+case class Action (action: LazyParameter[Result] = lazyfy(Success())) extends Fragment with IsExecutable with Isolable {
   val isolable = true
 
   def execute = action.value

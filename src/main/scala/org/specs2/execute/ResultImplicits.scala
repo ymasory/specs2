@@ -11,7 +11,7 @@ import Scalaz._
  */
 trait ResultImplicits {
 
-  implicit def verifyResultFunction[T, R <% Result](t: T => R) = new ResultFunctionVerification(t)
+  implicit def verifyResultFunction[T, R : Executable](t: T => R) = new ResultFunctionVerification(t)
 
   class ResultFunctionVerification[T, R](t: T => R)(implicit toResult: R => Result) {
 

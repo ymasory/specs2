@@ -3,7 +3,7 @@ package reporter
 
 import io._
 import specification._
-import execute.Executable
+import execute.IsExecutable
 
 class ExecutionModelSpec extends Specification with ScalaCheck { def is =
 
@@ -56,7 +56,7 @@ class ExecutionModelSpec extends Specification with ScalaCheck { def is =
     // print a label after each execution
     def simpleLabel(spec: Specification, output: Output) =
       label(spec)((i: Int) => {
-        case f: Executable => printAfterExecution("label "+i, output)(f)
+        case f: IsExecutable => printAfterExecution("label "+i, output)(f)
       })
 
     // print a label after each execution  for examples and steps
@@ -66,7 +66,7 @@ class ExecutionModelSpec extends Specification with ScalaCheck { def is =
         case f @ Step(_)      => printAfterExecution("label step "+i, output)(f)
       })
 
-    def printAfterExecution(s: String, output: Output) = (f: Executable) => {
+    def printAfterExecution(s: String, output: Output) = (f: IsExecutable) => {
       f.map { body =>
         val executed = body
         output.println(s)

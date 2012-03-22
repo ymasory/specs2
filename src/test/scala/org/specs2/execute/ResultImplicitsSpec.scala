@@ -23,5 +23,5 @@ class ResultImplicitsSpec extends Specification { def is =
   }
 
   /** this function is necessary to check that the type conversion to Result is indeed working and not conflicting with T => MatchResult[S] */
-  def check[T <% Result](t: =>T): Result = t
+  def check[T : Executable](t: =>T): Result = t
 }

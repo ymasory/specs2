@@ -63,7 +63,7 @@ trait FragmentExecution {
     case _                             => ExecutedNoText(isAction = true, new SimpleTimer, f.location)
   }
 
-  private def executeStep(stepName: String, s: Executable, location: Location)(implicit args: Arguments) = {
+  private def executeStep(stepName: String, s: IsExecutable, location: Location)(implicit args: Arguments) = {
     val timer = new SimpleTimer().start
     executeBody(s.execute) match {
       case err if err.isError  => ExecutedResult(NoMarkup(stepName+" error"), err, timer.stop, location, Stats(err))
