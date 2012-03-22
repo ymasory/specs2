@@ -55,7 +55,7 @@ trait AnyBaseMatchers {
   def not[T](m: Matcher[T]) = m.not
   
   /** matches if a.isEmpty */
-  def beEmpty[T <% Any { def isEmpty: Boolean }] = new Matcher[T] {
+  def beEmpty[T : IsEmpty] = new Matcher[T] {
     def apply[S <: T](iterable: Expectable[S]) = {
       result(iterable.value.isEmpty,
              iterable.description + " is empty", 
@@ -255,10 +255,10 @@ trait AnyBeHaveMatchers { outer: AnyMatchers =>
     def assignableFrom = result(outer.beAssignableFrom)
   }
   
-  implicit def anyWithEmpty[T <% Any { def isEmpty: Boolean }](result: MatchResult[T]) = 
+  implicit def anyWithEmpty[T : IsEmpty](result: MatchResult[T]) =
     new AnyWithEmptyMatchers(result)
 
-  class AnyWithEmptyMatchers[T <% Any { def isEmpty: Boolean }](result: MatchResult[T]) {
+  class AnyWithEmptyMatchers[T : IsEmpty](result: MatchResult[T]) {
     def empty = result(outer.beEmpty[T])
     def beEmpty = result(outer.beEmpty[T])
   }
