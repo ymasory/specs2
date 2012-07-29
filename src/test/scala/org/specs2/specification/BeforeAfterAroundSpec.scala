@@ -61,7 +61,7 @@ class BeforeAfterAroundSpec extends Specification { def is =
 
   def around = executeContains(
     new Spec with AroundExample with MockOutput {
-      def around[R <% Result](r: =>R) = { println("around"); r }
+      def around(r: =>Result) = { println("around"); r }
       "ex1" ! success
     },"around")
 
@@ -77,7 +77,7 @@ class BeforeAfterAroundSpec extends Specification { def is =
     new Spec with BeforeAfterAroundExample with MockOutput {
       def before = println("before")
       def after = println("after")
-      def around[R <% Result](r: =>R) = { println("around"); r }
+      def around(r: =>Result) = { println("around"); r }
       "ex1" ! success
     }, "before", "around", "after")
 }

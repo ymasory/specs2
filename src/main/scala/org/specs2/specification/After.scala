@@ -17,7 +17,7 @@ trait After extends Context { outer =>
    * execute an action returning a Result
    * and finally the after action 
    */
-  def apply[T <% Result](a: =>T): Result = {
+  def apply(a: =>Result): Result = {
 	  try { a }
 	  finally { after	}
   } 

@@ -13,19 +13,19 @@ import execute._
  */
 trait Around extends Context { outer =>
 
-  def around[T <% Result](t: =>T): Result
-  def apply[T <% Result](a: =>T) = around(a)
+  def around(t: =>Result): Result
+  def apply(a: =>Result) = around(a)
   
   /** compose the actions of 2 Around traits */
   def compose(a: Around): Around = new Around {
-    def around[T <% Result](t: =>T): Result = {
+    def around(t: =>Result): Result = {
       a.around(outer.around(t))
     }
   }
 
   /** sequence the actions of 2 Around traits */
   def then(a: Around): Around = new Around {
-    def around[T <% Result](t: =>T): Result = {
+    def around(t: =>Result): Result = {
       outer.around(a.around(t))
     }
   }

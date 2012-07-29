@@ -14,8 +14,8 @@ trait Contexts {
   /**
    * add a before action to any kind of result
    */
-  implicit def doBefore[T <% Result](t: =>T) = new BeforeResult(t)
-  class BeforeResult[T <% Result](t: =>T) {
+  implicit def doBefore(t: =>Result) = new BeforeResult(t)
+  class BeforeResult(t: =>Result) {
     def before(action: => Unit) = new Before {
       def before = action
     }.apply(t)
@@ -24,24 +24,24 @@ trait Contexts {
   /**
    * add an Around function to any kind of result
    */
-  implicit def doAround[T <% Result](t: =>T) = new AroundResult(t)
-  class AroundResult[T <% Result](t: =>T) {
+  implicit def doAround(t: =>Result) = new AroundResult(t)
+  class AroundResult(t: =>Result) {
     def around(f: Result => Result) = new Around {
-      def around[R](r: =>R)(implicit conv: R => Result): Result = f(conv(r))
+      def around(r: =>Result): Result = f(r)
     }.apply(t)
   }
 
   /**
    * add an after action to any kind of result
    */
-  implicit def doAfter[T <% Result](t: =>T) = new AfterResult(t)
-  class AfterResult[T <% Result](t: =>T) {
+  implicit def doAfter(t: =>Result) = new AfterResult(t)
+  class AfterResult(t: =>Result) {
     def after(action: => Unit) = new After {
       def after = action
     }.apply(t)
   }
 
-  protected[specs2] val defaultContext = new Context { def apply[T <% Result](a: =>T): Result = a }
+  protected[specs2] val defaultContext = new Context { def apply(a: =>Result): Result = a }
 
 }
 
@@ -49,9 +49,9 @@ trait Contexts {
  * Use this trait to deactivate the Contexts implicits
  */
 trait NoContexts extends Contexts {
-  override def doBefore[T <% Result](t: =>T) = super.doBefore(t)
-  override def doAround[T <% Result](t: =>T) = super.doAround(t)
-  override def doAfter[T <% Result](t: =>T) = super.doAfter(t)
+  override def doBefore(t: =>Result) = super.doBefore(t)
+  override def doAround(t: =>Result) = super.doAround(t)
+  override def doAfter(t: =>Result) = super.doAfter(t)
 }
 
 object Contexts extends Contexts

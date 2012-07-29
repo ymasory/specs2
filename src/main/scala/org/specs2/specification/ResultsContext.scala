@@ -28,7 +28,7 @@ trait StoredExpectationsContext extends StoredExpectations with StoredResultsCon
  * and returns the 'storedResults' as the summary of all results
  */
 trait StoredResultsContext extends Context { this: { def storedResults: Seq[Result]} =>
-  def apply[T <% Result](r: =>T): Result = {
+  def apply(r: =>Result): Result = {
     // evaluate r, triggering side effects
     r
     issues(storedResults, "\n")

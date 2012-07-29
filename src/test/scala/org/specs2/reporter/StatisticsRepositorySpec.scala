@@ -13,7 +13,7 @@ class StatisticsRepositorySpec extends Specification { def is = sequential ^
                                                                                                             end
 
 
-  case class repo() extends DefaultStatisticsRepository with BeforeAfter {
+  case class repo() extends DefaultStatisticsRepository { //with BeforeAfter {
     def before = {
       Seq(specName1, specName2) foreach { s => new java.io.File(specStatsPath(s)).delete }
     }
@@ -24,19 +24,19 @@ class StatisticsRepositorySpec extends Specification { def is = sequential ^
     val specName2 = SpecName("spec2")
     val (stats1, stats2) = (Stats(failures = 3), Stats(failures = 4))
 
-    def e1 = this {
+    def e1 = {//apply {
       storeStatistics(specName1, stats1)
       storeStatistics(specName2, stats2)
       getStatistics(specName1) must_== Some(Stats(failures = 3, expectations = 1))
     }
 
-    def e2 = this {
+    def e2 = {//apply {
       storeStatistics(specName1, stats1)
       storeStatistics(specName1, stats2)
       getStatistics(specName1) must_== Some(Stats(failures = 4, expectations = 1))
     }
 
-    def e3 = this {
+    def e3 = {//apply {
       val example = Example("e1", failure)
       storeResults(specName1, execute(example: Fragments))
       previousResult(specName1, example) must beSome(failure)
