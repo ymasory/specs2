@@ -333,7 +333,7 @@ There are some factory and implicit conversion methods to create Given/When/Then
 
         // if the Given step is only side-effecting we can omit the `and` call
         // this simplifies the use of Given steps in Unit Specifications
-        val number1: Given[Unit] = groupAs("\d+") and { (s: String) => value = s.toInt }
+        val number1: Given[Unit] = groupAs("\d+") { (s: String) => value = s.toInt }
 
  * convert a function `T => String... => S` to a `When[T, S]` step (*note the use of `and` after `readAs` and `groupAs`*)
 
@@ -584,6 +584,12 @@ The effect of doing so is that all the fragments of the children specification w
       include(xonly, resetTextIndentation)         ^
 
 In the code above there are specific arguments to the included specifications so that they are only displayed when there are failures.
+
+##### Inline
+
+When you include a specification in another one the console will display the beginning and end statistics of the included specification. If you just want to insert the "middle" fragments of the included specification you can use `inline`:
+
+     inline(otherSpecification)
 
 ##### Html link
 
@@ -1263,6 +1269,18 @@ Those are all the methods which you can use to create fragments in a unit specif
           "have a name" in { ... }
         }
 
+   Note that you can use a `for` loop to create examples with <code class="prettyprint">></code><code class="prettyprint">></code>:
+
+        "this system has 5 examples" >> {
+          (1 to 5) foreach { i => "example "+i >> ok }
+        }
+
+   And you can also use a `for` loop with the `in` operator to create a block of expectations:
+
+        "this example has 5 expectations" in {
+          (1 to 5) foreach { i => i must_== i }
+        }
+
  * `title`: give a title to the Specification
 
         "My spec title".title
@@ -1383,8 +1401,8 @@ To make things more concrete here is a full example:
           def e1 = string must have size(7)
         }
       }
-"""^
-"""
+      """^
+    """
 ### How to?
 
 #### Declare arguments
@@ -1589,7 +1607,7 @@ Tags can be used in a Specification to include or exclude some examples or a com
       class TaggedSpecification extends Specification with Tags { def is =
         "this is some introductory text"                          ^
         "and the first group of examples"                         ^
-          "example 1"                                             ! success ^ tag("feature 1", "unit")^
+          "example 1"                                             ! success ^ tag("feature1", "unit")^
           "example 2"                                             ! success ^ tag("integration")^
                                                                   ^ p^
         "and the second group of examples"                        ^          section("checkin")^
@@ -1605,9 +1623,12 @@ In that specification we're defining several tags and sections:
 
 Armed with this, it is now easy to include or exclude portions of the specification at execution time:
 
- * `args(include="feature 1")` will only include `example 1`
+ * `args(include="feature1")` will only include `example 1`
  * `args(exclude="integration")` will include everything except `example 2`
- * `args(include="checkin,unit")` will include `example 1` and the second group of examples (`example 3` and `example 4`)
+ * `args(include="checkin,unit")` will include anything having either `checkin` OR `unit`: i.e. `example 1` and the second group of examples (`example 3` and `example 4`)
+ * `args(include="feature1 && unit")` will include anything having `feature1` AND `unit`: i.e. `example 1`
+ * `args(include="feature1 && unit, checkin")` will include anything having `feature1` AND `unit`, OR having `checkin`: i.e. `example 1`, `example 3`, `example4`
+
 
 ##### In a unit specification
 
@@ -1689,7 +1710,7 @@ An easy way to avoid this situation is to "deactivate" the specs2 implicits by m
  * `org.specs2.specification.mutable.NoFragmentsBuilder`: deactivate the implicit conversions from to remove `in`, <code class="prettyprint">></code><code class="prettyprint">></code>, `should` and `can` methods from `String`s
 
   - - -
-      """^
+    """^
                                                                                                                         br^
   include(xonly, new GivenWhenThenSpec)                                                                                 ^
   include(xonly, exampleTextIndentation)                                                                                ^

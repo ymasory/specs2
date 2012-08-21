@@ -1,11 +1,11 @@
 /** Project */
 name := "specs2"
 
-version := "1.12-SNAPSHOT"
+version := "1.12.1"
 
 organization := "org.specs2"
 
-scalaVersion := "2.10.0-M4"
+scalaVersion := "2.10.0-M7"
 
 /** Shell */
 shellPrompt := { state => System.getProperty("user.name") + "> " }

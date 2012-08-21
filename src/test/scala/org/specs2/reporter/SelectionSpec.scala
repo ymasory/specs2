@@ -4,38 +4,40 @@ package reporter
 import specification._
 import main._
 import io._
-import org.scalacheck._
 import execute.Success
 
-class SelectionSpec extends Specification { def is =
-                                                                                                                      """
+class SelectionSpec extends Specification with Tags { def is =
+                                                                                                                        """
  Before executing and reporting a specification, the fragments must be selected:
 
  * with the ex argument
- * with tags                                                                                                           """^
-                                                                                                                       p ^
- "First of all examples are filtered"                                                                                  ^
-   "when the user specifies a regular expression: ex = ex1.*"                                                          ^
-     "in the spec"                                                                                                     ! filter().e1^
-     "on the command line"                                                                                             ! filter().e2^
-   "if no filter is specified, nothing must be filtered out"                                                           ! filter().e3^
-                                                                                                                       p^
- "It is possible to select only some previously executed fragments"                                                    ^
-   "wasIssue selects only the fragments which were failed or in error"                                                 ! rerun().e1^
-                                                                                                                       p^
- "if a specification contains the 'isolated' argument"                                                                 ^
-   "examples bodies must be copied"                                                                                    ! isolate().e1^
-   "along with all the previous steps"                                                                                 ! isolate().e2^
-   "steps bodies must not be copied"                                                                                   ! isolate().e3^
-   "actions bodies must be copied"                                                                                     ! isolate().e4^
-   "if the examples, steps or actions are marked as global, they are never copied"                                     ! isolate().e5^t^
-     "with a global step before an example"                                                                            ! isolate().e6^
-                                                                                                                       end
+ * with tags                                                                                                            """^
+                                                                                                                        p ^
+ "First of all examples are filtered"                                                                                   ^
+   "when the user specifies a regular expression: ex = ex1.*"                                                           ^
+     "in the spec"                                                                                                      ! filter().e1^
+     "on the command line"                                                                                              ! filter().e2^
+     "if the regexp is invalid, it is quoted"                                                                           ! filter().e3^
+   "if no filter is specified, nothing must be filtered out"                                                            ! filter().e4^
+                                                                                                                        p^
+ "It is possible to select only some previously executed fragments"                                                     ^
+   "wasIssue selects only the fragments which were failed or in error"                                                  ! rerun().e1^
+                                                                                                                        p^
+ "if a specification contains the 'isolated' argument"                                                                  ^
+   "examples bodies must be copied"                                                                                     ! isolate().e1^
+   "along with all the previous steps"                                                                                  ! isolate().e2^
+   "steps bodies must not be copied"                                                                                    ! isolate().e3^
+   "actions bodies must be copied"                                                                                      ! isolate().e4^
+   "if the examples, steps or actions are marked as global, they are never copied"                                      ! isolate().e5^t^
+     "with a global step before an example"                                                                             ! isolate().e6^
+   "tags can be used"                                                                                                   ! isolate().e7^
+                                                                                                                        end
   
   case class filter() extends WithSelection {
     def e1 = select(args(ex = "ex1") ^ ex1 ^ ex2).toString must not contain("ex2")
     def e2 = select(ex1 ^ ex2)(Arguments("ex", "ex1")).toString must not contain("ex2")
-    def e3 = select(ex1 ^ ex2).toString must contain("ex1")
+    def e3 = select(ex3 ^ ex2)(Arguments("ex", "(+40k)")).toString must contain("(+40k)")
+    def e4 = select(ex1 ^ ex2).toString must contain("ex1")
   }
 
   case class rerun() extends WithSelection {
@@ -67,6 +69,15 @@ class SelectionSpec extends Specification { def is =
 
     def e5 = isIsolated(new SpecificationWithLocalVariable { def is = isolated ^ ("e1" ! { i = 1; ok }).global }, expectedLocalValue = 1)
     def e6 = isIsolated(new SpecificationWithLocalVariable { def is = isolated ^ Step(i = 1).global ^ "e1" ! { i = 2; ok } }, expectedLocalValue = 1)
+    def e7 = {
+      val spec = (new org.specs2.mutable.Specification with org.specs2.mutable.Tags {
+        isolated
+        "ex1" >> ok
+        tag("x")
+        "ex2" >> ok
+      })
+      selection.select(Arguments("include x"))(spec).content.examples must have size(1)
+    }
   }
 
   trait SpecificationWithLocalVariable extends Specification {
@@ -75,6 +86,7 @@ class SelectionSpec extends Specification { def is =
 
   val ex1 = "ex1" ! success
   val ex2 = "ex2" ! success
+  val ex3 = "(+40k)" ! success
 
 }
 

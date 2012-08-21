@@ -29,6 +29,9 @@ trait SpecificationInclusion { this: FragmentsBuilder =>
   def include(args: Arguments, s: SpecificationStructure, ss: SpecificationStructure*): FragmentsFragment = include(args, s.content, ss.map(_.content):_*)
   def include(args: Arguments, f: Fragments): FragmentsFragment = include(f.overrideArgs(args))
   def include(args: Arguments, f: Fragments, fs: Fragments*): FragmentsFragment = include(ma(f +: fs).sum.overrideArgs(args))
+
+  /** add the fragments of another specification without start and end */
+  def inline(specs: SpecificationStructure*): Fragments = Fragments.createList(specs.flatMap(s => s.map(s.is).middle):_*)
 }
 /**
  * The structure of a Specification is simply defined as a sequence of fragments
@@ -46,8 +49,10 @@ trait SpecificationStructure {
    * this "cached" version of the Fragments is kept hidden from the user to avoid polluting
    * the Specification namespace.
    * SpecStart and SpecEnd fragments are added if the user haven't inserted any
+   *
+   * A creation path is possibly set on Examples and Actions if they haven't any
    */
-  private[specs2] lazy val content: Fragments = map(Fragments.withSpecName(is, this))
+  private[specs2] lazy val content: Fragments = map(Fragments.withCreationPaths(Fragments.withSpecName(is, this)))
 }
 
 /**
@@ -86,7 +91,6 @@ object SpecificationStructure {
     // finally retry the original class name to display the error messages
     createSpecificationFromClassOrObject(className, classLoader).
       orElse(tryToCreateObject[SpecificationStructure](className, loader = classLoader)).map(applyCommandLineArguments)
-
   }
 
   /**

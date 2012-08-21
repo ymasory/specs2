@@ -4,7 +4,7 @@ package guide
 import specification.Forms._
 
 class Matchers extends UserGuidePage { def is = literate ^
-"""
+  """
 There are many ways to define expectations in ***specs2***. You can define expectations with anything that returns a `Result`:
 
   * Boolean
@@ -54,9 +54,9 @@ This is by far the largest category of Results in ***specs2***. They cover many 
 #### Out of the box
 
 The most common matchers are automatically available when extending the `Specification` trait:
-"""^
+  """^
   MatcherCards.toTabs^p^
-"""
+  """
 The examples above show how to use matchers:
 
  * the general form for using a matcher is: `a must matcher`
@@ -67,9 +67,9 @@ The examples above show how to use matchers:
 #### Optional
 
 These other matchers need to be selectively added to the specification by adding a new trait:
-"""^
+  """^
   OptionalMatcherCards.toTabs^p^
-"""
+  """
 
 #### Custom
 
@@ -84,14 +84,17 @@ There are many ways to create matchers for your specific usage. The simplest way
         def allBeGreaterThan3: Matcher[Seq[Int]]   = be_>=(2).foreach    // like forall but execute all matchers and collect the results
         def haveOneGreaterThan2: Matcher[Seq[Int]] = be_>=(2).atLeastOnce
 
- * adapting the actual value. This matcher adapts the existing `be_<=` matcher to a matcher applicable to `Any`
+ * adapting the actual value
 
+        // This matcher adapts the existing `be_<=` matcher to a matcher applicable to `Any`
         def beShort = be_<=(5) ^^ { (t: Any) => t.toString.size }
         def beShort = be_<=(5) ^^ { (t: Any) => t.toString.size aka "the string size" }
 
         // !!! use a BeTypedEqualTo matcher when using aka and equality !!!
         def beFive = be_===(5) ^^ { (t: Any) => t.toString.size aka "the string size" }
 
+        // The adaptation can also be done the other way around when it's more readable
+        def haveExtension(extension: =>String) = ((_:File).getPath) ^^ endWith(extension)
 
  * adapting the actual and expected values. This matcher compares 2 `Human` objects but set their `wealth` field to 0
    so that the equals method will not fail on that field:
@@ -194,22 +197,22 @@ If you have the same "MatchResult" expression that you'd like to verify for diff
 
 A clever way of creating expectations in ***specs2*** is to use the [ScalaCheck](http://code.google.com/p/scalacheck) library.
 
-To declare ScalaCheck properties you first need to extend the `ScalaCheck` trait. Then you can pass functions to the `check` method and use the resulting block as your example body:
+To declare ScalaCheck properties you first need to extend the `ScalaCheck` trait. Then you can pass functions returning any kind of `Result` (`Boolean`, `Result`, `MatchResult`) to the `prop` method and use the resulting `Prop` as your example body:
 
-      "addition and multiplication are related" ! check { (a: Int) => a + a == 2 * a }
+      "addition and multiplication are related" ! prop { (a: Int) => a + a == 2 * a }
 
 The function that is checked can either return:
 
       // a Boolean
-      "addition and multiplication are related" ! check { (a: Int) => a + a == 2 * a }
+      "addition and multiplication are related" ! prop { (a: Int) => a + a == 2 * a }
 
       // a MatchResult
-      "addition and multiplication are related" ! check { (a: Int) => a + a must_== 2 * a }
+      "addition and multiplication are related" ! prop { (a: Int) => a + a must_== 2 * a }
 
       // a Prop
-      "addition and multiplication are related" ! check { (a: Int) => (a > 0) ==> (a + a must_== 2 * a) }
+      "addition and multiplication are related" ! prop { (a: Int) => (a > 0) ==> (a + a must_== 2 * a) }
 
-Note that if you pass functions using MatchResults you will get better failure messages so you are encouraged to do so.
+Note that if you pass functions using `MatchResult`s you will get better failure messages so you are encouraged to do so.
 
 #### Arbitrary instances
 
@@ -254,7 +257,7 @@ ScalaCheck test generation can be tuned with a few properties. If you want to ch
 
 It is also possible to specifically set the execution parameters on a given property:
 
-      "this is a specific property" ! check { (a: Int, b: Int) =>
+      "this is a specific property" ! prop { (a: Int, b: Int) =>
         (a + b) must_== (b + a)
       }.set(minTestsOk -> 200, workers -> 3)
 
@@ -537,7 +540,7 @@ Forms are a way to represent domain objects or service, and declare expected val
 
 Forms can be designed as reusable pieces of specification where complex forms can be built out of simple ones.
 
-""" ^
+  """ ^
   "Here's " ~ ("how to use Forms", new org.specs2.guide.Forms) ^
 """
 
@@ -611,14 +614,14 @@ In specs2, those 2 methods are defined by the `org.specs2.matcher.ThrownMessages
     implicit val params = set(minTestsOk -> 20)
 
     def is = "Scalacheck".title ^
-    "addition and multiplication are related" ! Prop.forAll { (a: Int) => a + a == 2 * a }              ^
-    "addition and multiplication are related" ! check { (a: Int) => a + a == 2 * a }                    ^
-    "addition and multiplication are related" ! check { (a: Int) => a + a must_== 2 * a }               ^
-    "addition and multiplication are related" ! check { (a: Int) => (a > 0) ==> (a + a must_== 2 * a) } ^
-    "this is a specific property" ! check { (a: Int, b: Int) =>
+    "addition and multiplication are related" ! Prop.forAll { (a: Int) => a + a == 2 * a }             ^
+    "addition and multiplication are related" ! prop { (a: Int) => a + a == 2 * a }                    ^
+    "addition and multiplication are related" ! prop { (a: Int) => a + a must_== 2 * a }               ^
+    "addition and multiplication are related" ! prop { (a: Int) => (a > 0) ==> (a + a must_== 2 * a) } ^
+    "this is a specific property" ! prop { (a: Int, b: Int) =>
       (a + b) must_== (b + a)
-    }.set(minTestsOk -> 200, workers -> 1)                                                              ^
-                                                                                                        end
+    }.set(minTestsOk -> 200, workers -> 1)                                                             ^
+                                                                                                       end
   }
 
   import org.specs2.matcher._

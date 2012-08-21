@@ -7,7 +7,7 @@ import LazyParameters._
 import main.Arguments
 import execute._
 import text._
-import text.Trim._
+import Regexes._
 import org.specs2.internal.scalaz.Monoid
 import io.Location
 import scala.Either
@@ -18,9 +18,8 @@ import data.{SeparatedTags, IncludedExcluded}
  * an Example
  */
 sealed trait Fragment {
-  val linkedTo: Option[SpecificationStructure] = None
-  def matches(s: String) = true
   val location: Location = new Location
+  def matches(s: String) = true
 }
 
 /**
@@ -79,7 +78,7 @@ case class SpecEnd(specName: SpecName, isSeeOnlyLink: Boolean = false) extends F
   def title = specName.title
   def seeOnlyLinkIs(s: Boolean) = copy(isSeeOnlyLink = s)
 
-  override def matches(s: String) = name matches s
+  override def matches(s: String) = name.matchesSafely(s, ".*")
   override def toString = "SpecEnd("+title+")"
 }
 
@@ -96,11 +95,22 @@ case class Text(t: String) extends Fragment {
  * - a description: some text, with possibly some markup annotations for rendering code fragments (used in AutoExamples)
  * - a body: some executable code returning a Result
  */
-case class Example private[specification] (desc: MarkupString = NoMarkup(""), body: () => Result) extends Fragment with Executable with Isolable {
+case class Example private[specification] (desc: MarkupString = NoMarkup(""), body: () => Result) extends Fragment with Executable with Isolable { outer =>
   val isolable = true
 
+  /** internal specs2 variable to keep track of how an Example has been created */
+  private[specs2] val creationPath: Option[CreationPath] = None
+
   def execute = body()
-  override def matches(s: String) = desc.toString.removeAll("\n").removeAll("\r").matches(s)
+
+  /**
+   * match the description of an example with a regular expression.
+   *
+   * If the regexp doesn't compile, it is used literally by quoting it. However this regexp is usually passed as the
+   * Arguments.ex value, it is enclosed with '.*' characters, so they are removed and added back before quotation
+   */
+  override def matches(s: String) = desc.toString.matchesSafely(s, enclosing = ".*")
+
   override def toString = "Example("+desc+")"
   override def map(f: Result => Result) = Example(desc, f(body()))
 
@@ -112,7 +122,19 @@ case class Example private[specification] (desc: MarkupString = NoMarkup(""), bo
   }
 
   /** this fragment can not be executed in a separate specification */
-  def global = new Example(desc, body) { override val isolable = false }
+  def global = new Example(desc, body) {
+    override val isolable     = false
+    override val creationPath = outer.creationPath
+    override val location     = outer.location
+  }
+
+  /** set a creation path, if not already set, on this example to possibly isolate it during its execution */
+  private[specs2]
+  def creationPathIs(path: CreationPath) = new Example(desc, body) {
+    override val creationPath = if (outer.creationPath.isDefined) outer.creationPath else Some(path)
+    override val isolable     = outer.isolable
+    override val location     = outer.location
+  }
 }
 
 case object Example {
@@ -141,8 +163,19 @@ case class Step (step: LazyParameter[Result] = lazyfy(Success()), stopOnFail: Bo
   override def map(f: Result => Result) = Step(step map f)
 
   /** this fragment can not be executed in a separate specification */
-  def global = new Step(step) { override val isolable = false }
+  def global = new Step(step) {
+    override val isolable = false
+  }
+
+  // we must override the case class equality to avoid evaluating the step
+  override def equals(any: Any) = any match {
+    case s: Step => s eq this
+    case _       => false
+  }
+  // we must override the case class hashCode to avoid evaluating the step
+  override def hashCode = super.hashCode
 }
+
 case object Step {
   /** create a Step object from either a previous result, or a value to evaluate */
   def fromEither[T](r: =>Either[Result, T]) = new Step(either(r))
@@ -165,8 +198,11 @@ case object Step {
  *
  * It is only reported in case of a failure
  */
-case class Action (action: LazyParameter[Result] = lazyfy(Success())) extends Fragment with Executable with Isolable {
+case class Action (action: LazyParameter[Result] = lazyfy(Success())) extends Fragment with Executable with Isolable { outer =>
   val isolable = true
+
+  /** internal specs2 variable to keep track of how an Example has been created */
+  private[specs2] val creationPath: Option[CreationPath] = None
 
   def execute = action.value
   override def toString = "Action"
@@ -174,8 +210,29 @@ case class Action (action: LazyParameter[Result] = lazyfy(Success())) extends Fr
   override def map(f: Result => Result) = Action(action map f)
 
   /** this fragment can not be executed in a separate specification */
-  def global = new Action(action) { override val isolable = false }
+  def global = new Action(action) {
+    override val isolable = false
+    override val creationPath = outer.creationPath
+    override val location     = outer.location
+  }
+
+  /** set a creation path, if not already set, on this action to possibly isolate it during its execution */
+  private[specs2] def creationPathIs(path: CreationPath) = new Action(action) {
+    override val creationPath = if (outer.creationPath.isDefined) outer.creationPath else Some(path)
+    override val isolable     = outer.isolable
+    override val location     = outer.location
+  }
+
+  // we must override the case class equality to avoid evaluating the action
+  override def equals(any: Any) = any match {
+    case a: Action => a eq this
+    case _         => false
+  }
+
+  // we must override the case class hashCode to avoid evaluating the action
+  override def hashCode = super.hashCode
 }
+
 case object Action {
   /** create an Action object from any value */
   def apply[T](r: =>T) = fromEither(trye(r)(Error(_)))

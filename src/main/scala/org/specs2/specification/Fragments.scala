@@ -6,6 +6,7 @@ import execute.Executable
 import main.Arguments
 import org.specs2.internal.scalaz.Monoid
 import Fragments._
+import specification.StandardFragments.{End, Br}
 
 /**
  * A Fragments object is a list of fragments with a SpecStart and a SpecEnd
@@ -13,7 +14,7 @@ import Fragments._
 case class Fragments(specTitle: Option[SpecName] = None, middle: Seq[Fragment] = Vector(),
                      arguments: Arguments = Arguments(), linked: Linked = Linked()) {
 
-  def fragments: Seq[Fragment] = if (middle.isEmpty && !linked.isLink) Vector() else (start +: middle :+ end)
+  def fragments: Seq[Fragment] = if (middle.isEmpty && !linked.isLink) Vector() else (specStart +: middle :+ specEnd)
 
   def specTitleIs(name: SpecName): Fragments = copy(specTitle = specTitle.filterNot(_.title.isEmpty).map(_.overrideWith(name)).orElse(Some(name)))
 
@@ -44,12 +45,11 @@ case class Fragments(specTitle: Option[SpecName] = None, middle: Seq[Fragment] =
 
   override def toString = fragments.mkString("\n")
 
-  def specName = start.specName
-  def name = start.name
-  
-  lazy val start: SpecStart = SpecStart(specTitle.getOrElse(SpecName("")), arguments, linked)
-  lazy val end: SpecEnd = SpecEnd(start.specName)
+  def specName = specStart.specName
+  def name     = specStart.name
 
+  lazy val specStart: SpecStart = SpecStart(specTitle.getOrElse(SpecName("")), arguments, linked)
+  lazy val specEnd:   SpecEnd   = SpecEnd(specName)
 }
 
 /**
@@ -85,10 +85,20 @@ object Fragments {
   def isStep: Function[Fragment, Boolean] = { case Step(_,_) => true; case _ => false }
   /** @return true if the Fragment is a SpecStart or a SpecEnd */
   def isSpecStartOrEnd: Function[Fragment, Boolean] = { case SpecStart(_,_,_) | SpecEnd(_,_) => true; case _ => false }
+  /** @return the spec start if the Fragment is a SpecStart */
+  def isASpecStart: PartialFunction[Fragment, Fragment] = { case s @ SpecStart(_,_,_) => s }
+  /** @return the spec end if the Fragment is a SpecEnd */
+  def isASpecEnd: PartialFunction[Fragment, Fragment] = { case s @ SpecEnd(_,_) => s }
   /** @return true if the Fragment is an Example or a Step */
   def isExampleOrStep: Function[Fragment, Boolean] = (f: Fragment) => isExample(f) || isStep(f)
-  /** @return the step if the Fragment is a Step*/
+  /** @return the step if the Fragment is a Step */
   def isAStep: PartialFunction[Fragment, Step] = { case s @ Step(_,_) => s }
+  /** @return the action if the Fragment is an Actino */
+  def isAnAction: PartialFunction[Fragment, Action] = { case a @ Action(_) => a }
+  /** @return the step if the Fragment is a Br fragment */
+  def isABr: PartialFunction[Fragment, Fragment] = { case br @ Br() => br }
+  /** @return the step if the Fragment is an End fragment */
+  def isAnEnd: PartialFunction[Fragment, Fragment] = { case e @ End() => e }
 
   /** @return a Fragments object with the appropriate name set on the SpecStart fragment */
   def withSpecName(fragments: Fragments, name: SpecName): Fragments = fragments.specTitleIs(name)
@@ -99,6 +109,19 @@ object Fragments {
    * That name is derived from the specification structure name
    */
   def withSpecName(fragments: Fragments, s: SpecificationStructure): Fragments = withSpecName(fragments, SpecName(s))
+  /**
+   * @return a Fragments object with creation paths set on Examples and Actions
+   *
+   * The path of a Fragment is either:
+   *
+   *  - set at construction time when it comes from a mutable specification
+   *  - its index in the sequence of fragments for an acceptance specification
+   */
+  def withCreationPaths(fragments: Fragments): Fragments = fragments.copy(middle = fragments.middle.zipWithIndex.map {
+    case (e @ Example(_,_), i) => e.creationPathIs(AcceptanceCreationPath(Seq(i+1)))
+    case (a @ Action(_), i)    => a.creationPathIs(AcceptanceCreationPath(Seq(i+1)))
+    case (other, i)            => other
+  })
 
   /**
    * Fragments can be added as a monoid

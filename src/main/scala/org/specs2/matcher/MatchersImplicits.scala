@@ -23,7 +23,7 @@ trait MatchersImplicits extends Expectations {
   /** 
    * implicit definition to transform a Seq of MatchResults to a Result
    */ 
-  implicit def seqToResult[T](r: Seq[MatchResult[T]]): Result = r.reduceLeft(_ and _).toResult
+  implicit def seqToResult[T](r: Seq[MatchResult[T]]): Result = r.foldLeft(StandardResults.success: Result)(_ and _.toResult)
   /** 
    * implicit definition to transform any MatchResult to a Result
    */ 
@@ -91,6 +91,15 @@ trait MatchersImplicits extends Expectations {
      * check that the function is valid at least once
      */
     def atLeastOnce(values: Seq[T]): MatchResult[Seq[T]] = verifyFunction((t: T) => f(t).apply(Expectable(t))).atLeastOnce(values)
+  }
+
+  /**
+   * this implicit provides an inverted syntax to adapt matchers to make the adaptation more readable in some cases:
+   * - def haveExtension(extension: =>String) = ((_:File).getPath) ^^ endWith(extension)
+   */
+  implicit def adapterFunction[T, S](f: T => S) = new AdapterFunction(f)
+  case class AdapterFunction[T, S](f: T => S) {
+    def ^^(m: Matcher[S]): Matcher[T] = m ^^ f
   }
 
   /**
