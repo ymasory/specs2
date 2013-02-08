@@ -10,10 +10,12 @@ class TryMatchersSpec extends Specification { def is =
                                                                                                                         p^
   "beTSuccess checks if an element is TSuccess(_)"                                                                      ^
   { TSuccess(1) must beTSuccess }                                                                                       ^
+  { TSuccess(1) must be tsuccess }                                                                                      ^
   { TSuccess(1) must beTSuccess(1) }                                                                                    ^
+  { TSuccess(1) must be tsuccess(1) }                                                                                   ^
   { TSuccess(1) must beTSuccess.which(_ > 0) }                                                                          ^
-  // { TSuccess(1) must beTSuccess.like { case a if a > 0 => ok } }                                                        ^
-  // { TSuccess(1) must not be TSuccess(2) }                                                                               ^
+  { TSuccess(1) must beTSuccess.like { case a if a > 0 => ok } }                                                        ^
+  { TSuccess(1) must not be TSuccess(2) }                                                                               ^
   // { None must not be some }                                                                                             ^
   // { None must not be some(2) }                                                                                          ^
   //                                                                                                                       p^
