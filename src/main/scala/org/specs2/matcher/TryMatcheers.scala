@@ -8,7 +8,7 @@ import scala.util.{ Success => TSuccess, Failure => TFailure, Try }
 /**
  * Matchers for capital-T Trys.
  */
-trait TryMatchers extends TryBaseMatchers with TryBeHaveMatchers
+trait TryMatchers extends TryBaseMatchers //with TryBeHaveMatchers
 object TryMatchers extends TryMatchers
 
 private[specs2]
@@ -41,10 +41,12 @@ trait TryBaseMatchers {
   // def beAsNoneAs[A](other: =>Try[A]) = new Matcher[Try[A]] {
   //   def apply[S <: Try[A]](a: Expectable[S]) = {
   //     val b = other
-  //     result(a.value == None && b == None || a.value != None && b != None, 
-  //            a.description + " is None as well",
-  //            if (a.value == None) b + " is not None" else a.description + " is not None",
-  //            a)
+  //     result(
+  //       a.value == None && b == None || a.value != None && b != None,
+  //       a.description + " is None as well",
+  //       if (a.value == None) b + " is not None" else a.description + " is not None",
+  //       a
+  //     )
   //   }
   // }
   // def asNoneAs[A](other: =>Try[A]) = beAsNoneAs(other)
@@ -86,10 +88,12 @@ class TSuccessMatcher[A] extends Matcher[Try[A]] {
         case TSuccess(t) if !f.isDefinedAt(t) => Failure("function undefined")
         case None                         => Failure("no match")
       }
-      result(res.isSuccess,
-             value.description+" is TSuccess[A] and "+res.message,
-             value.description+" is TSuccess[A] but "+res.message,
-             value)
+      result(
+        res.isSuccess,
+        value.description + " is TSuccess[A] and " + res.message,
+        value.description + " is TSuccess[A] but " + res.message,
+        value
+      )
     }
   }
 }

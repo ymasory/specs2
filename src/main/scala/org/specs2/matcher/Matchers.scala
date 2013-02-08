@@ -16,6 +16,7 @@ trait Matchers extends AnyMatchers
                   with ExceptionMatchers
                   with NumericMatchers
                   with OptionMatchers
+                  with TryMatchers
                   with EitherMatchers
                   with EventuallyMatchers
                   with FileMatchers
