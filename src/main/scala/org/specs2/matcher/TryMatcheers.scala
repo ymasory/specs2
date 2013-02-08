@@ -24,9 +24,9 @@ trait TryBaseMatchers {
              value)
     }
   }
-  def tsuccess[A](t: =>A) = beTSuccess(t)
+  // def tsuccess[A](t: =>A) = beTSuccess(t)
   def beTSuccess[A] = new TSuccessMatcher[A]
-  def tsuccess[A] = beTSuccess[A]
+  // def tsuccess[A] = beTSuccess[A]
 
   /* Failure */
   // def beNone = new Matcher[Try[Any]] {
@@ -58,8 +58,8 @@ trait TryBeHaveMatchers { outer: TryBaseMatchers =>
   class TryResultMatcher[A](result: MatchResult[Try[A]]) {
 
     /* Success */
-    def beTSuccess = result(outer.beTSuccess)
-    def beTSuccess(t: =>A) = result(outer.beTSuccess(t))
+    // def beTSuccess = result(outer.beTSuccess)
+    // def beTSuccess(t: =>A) = result(outer.beTSuccess(t))
 
     /* Failure */
     // def beNone = result(outer.beNone)
@@ -73,27 +73,29 @@ trait TryBeHaveMatchers { outer: TryBaseMatchers =>
 private[specs2]
 class TSuccessMatcher[A] extends Matcher[Try[A]] {
   def apply[S <: Try[A]](value: Expectable[S]) = {
-    result(value.value.map(t => true).getOrElse(false),
-           value.description + " is TSuccess[A]",
-           value.description + " is not TSuccess[A]",
-           value)
+    result(
+      value.value.map(t => true).getOrElse(false),
+      value.description + " is TSuccess[A]",
+      value.description + " is not TSuccess[A]",
+      value
+    )
   }
   def which(f: A => Boolean) = this ^^ { (t: Try[A]) => t filter f }
-  def like(f: PartialFunction[A, MatchResult[_]]) = this and partialMatcher(f)
+  // def like(f: PartialFunction[A, MatchResult[_]]) = this and partialMatcher(f)
 
-  private def partialMatcher(f: PartialFunction[A, MatchResult[_]]) = new Matcher[Try[A]] {
-    def apply[S <: Try[A]](value: Expectable[S]) = {
-      val res: Result = value.value match {
-        case TSuccess(t) if f.isDefinedAt(t)  => f(t).toResult
-        case TSuccess(t) if !f.isDefinedAt(t) => Failure("function undefined")
-        case None                         => Failure("no match")
-      }
-      result(
-        res.isSuccess,
-        value.description + " is TSuccess[A] and " + res.message,
-        value.description + " is TSuccess[A] but " + res.message,
-        value
-      )
-    }
-  }
+  // private def partialMatcher(f: PartialFunction[A, MatchResult[_]]) = new Matcher[Try[A]] {
+  //   def apply[S <: Try[A]](value: Expectable[S]) = {
+  //     val res: Result = value.value match {
+  //       case TSuccess(t) if f.isDefinedAt(t)  => f(t).toResult
+  //       case TSuccess(t) if !f.isDefinedAt(t) => Failure("function undefined")
+  //       case None                         => Failure("no match")
+  //     }
+  //     result(
+  //       res.isSuccess,
+  //       value.description + " is TSuccess[A] and " + res.message,
+  //       value.description + " is TSuccess[A] but " + res.message,
+  //       value
+  //     )
+  //   }
+  // }
 }
